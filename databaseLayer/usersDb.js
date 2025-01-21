@@ -1,12 +1,12 @@
 // databaseLayer/usersDb.js
-const { UserEntity } = require('../models');
+const { User } = require('../models');
 
 const getUserByEmail = async (email) => {
-    return await UserEntity.findOne({ where: { email } });
+    return await User.findOne({ where: { email } });
 };
 
 const getUserById = async (id) => {
-    const user = await UserEntity.findByPk(id);
+    const user = await User.findByPk(id);
     if (!user) {
         throw new Error('User not found');
     }
@@ -14,21 +14,22 @@ const getUserById = async (id) => {
 };
 
 const addUser = async (user) => {
-    return UserEntity.create(user);
+    console.log(user);
+    return User.create(user);
 };
 
 const updateUser = async (user) => {
-    const [updated] = await UserEntity.update(user, {
+    const [updated] = await User.update(user, {
         where: { id: user.id }
     });
     if (!updated) {
         throw new Error('User not found');
     }
-    return await UserEntity.findByPk(user.id);
+    return await User.findByPk(user.id);
 };
 
 const deleteUser = async (id) => {
-    const user = await UserEntity.findByPk(id);
+    const user = await User.findByPk(id);
     if (!user) {
         throw new Error('User not found');
     }
@@ -37,21 +38,21 @@ const deleteUser = async (id) => {
 };
 
 const authenticateUser = async (email, password) => {
-    return await UserEntity.findOne({ where: { email, password } });
+    return await User.findOne({ where: { email, password } });
 };
 
 const isEmailInUse = async (email) => {
-    const count = await UserEntity.count({ where: { email } });
+    const count = await User.count({ where: { email } });
     return count > 0;
 };
 
 const isUserInUseById = async (id) => {
-    const count = await UserEntity.count({ where: { id } });
+    const count = await User.count({ where: { id } });
     return count > 0;
 };
 
 const isUserInUseByEmail = async (email) => {
-    const count = await UserEntity.count({ where: { email } });
+    const count = await User.count({ where: { email } });
     return count > 0;
 };
 

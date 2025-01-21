@@ -1,43 +1,35 @@
-require("dotenv").config();
-
 const express = require("express");
-const multer = require("multer");
-
-// const cookieSession = require("cookie-session");
-const session = require("express-session");
-const passport = require("passport");
-const { isAuthenticated } = require("./middlewares");
-require("./controllers/auth");
+const cors = require("cors");
+const { Sequelize } = require("sequelize");
+const sequelize = require("./config/db"); // Import the sequelize instance
+const router = require("./routes");
+const db = require("sequelize");
 
 const app = express();
-const port = 4848;
-const { db } = require("./models");
+const port = 5179;
 
-const router = require("./routes");
-const { AsyncQueueError } = require("sequelize");
+// Add CORS middleware
+app.use(cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// Parse JSON bodies
 app.use(express.json());
 
-app.use(
-    session({
-        secret: [process.env.COOKIE_KEY],
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 24 * 60 * 60 * 1000,
-        },
-    })
-);
+// Test the database connection
+sequelize.authenticate()
+    .then(() => console.log("Database connected..."))
+    .catch(err => console.log("Error: " + err));
 
-app.use((req, res, next) => {
-    console.log("Sesiune:", req.session);
-    next();
-});
+// Sync models with the database
+sequelize.sync()
+    .then(() => console.log("Database synced..."))
+    .catch(err => console.log("Error: " + err));
 
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use("/api", router);
+// Use the router for API routes
+app.use("", router);
 
 app.get("/reset", async (req, res) => {
     try {
@@ -50,31 +42,8 @@ app.get("/reset", async (req, res) => {
     }
 });
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "./uploads");
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname);
-    },
-});
-
-const upload = multer({ storage });
-
-app.post("/api/upload", upload.single("file"), function (req, res, next) {
-    console.log(req.file);
-    res.send({ message: "Project uploaded successfully" });
-});
-
-app.get("/secret", isAuthenticated, (req, res) => {
-    res.status(200).send({ message: "Esti autorizat!" });
-});
-
-app.use("/*", (req, res) => {
-    res.status(200).send("Rulez boss");
-});
-
+// Start the server
 app.listen(port, () => {
-    console.log(`Server is running on ${port}`);
+    console.log(`Server is running on port ${port}`);
     console.log(`http://localhost:${port}`);
 });

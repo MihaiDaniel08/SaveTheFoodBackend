@@ -1,16 +1,16 @@
 // databaseLayer/foodCategoryDb.js
 const { Op } = require('sequelize');
-const { FoodCategoryEntity, FoodEntity } = require('../models');
+const { FoodCategory, Food } = require('../models');
 
 const getFoodCategoriesByUserId = async (userId) => {
-    return await FoodCategoryEntity.findAll({
+    return await FoodCategory.findAll({
         where: { userId },
-        include: [{ model: FoodEntity, as: 'foods' }]
+        include: [{ model: Food, as: 'foods' }]
     });
 };
 
 const getFoodsWithoutCategory = async (userId) => {
-    return await FoodEntity.findAll({
+    return await Food.findAll({
         where: {
             userId,
             foodCategoryId: { [Op.is]: null }
@@ -20,16 +20,16 @@ const getFoodsWithoutCategory = async (userId) => {
 
 const addFoodCategory = async (userId, foodCategory) => {
     foodCategory.userId = userId;
-    return FoodCategoryEntity.create(foodCategory);
+    return FoodCategory.create(foodCategory);
 };
 
 const addFoodToCategory = async (foodCategoryId, foodId) => {
-    const food = await FoodEntity.findByPk(foodId);
+    const food = await Food.findByPk(foodId);
     if (!food) {
         return { status: 404, message: 'Food not found' };
     }
-    const foodCategory = await FoodCategoryEntity.findByPk(foodCategoryId, {
-        include: [{ model: FoodEntity, as: 'foods' }]
+    const foodCategory = await FoodCategory.findByPk(foodCategoryId, {
+        include: [{ model: Food, as: 'foods' }]
     });
     if (!foodCategory) {
         return { status: 404, message: 'Food category not found' };

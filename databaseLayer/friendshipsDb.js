@@ -1,9 +1,9 @@
 // databaseLayer/friendshipsDb.js
-const { UserEntity, FriendshipEntity } = require('../models');
+const { User, Friendship } = require('../models');
 const {Op} = require("sequelize");
 
 const getFriendsByUserId = async (userId) => {
-    const friendships = await FriendshipEntity.findAll({
+    const friendships = await Friendship.findAll({
         where: {
             [Op.or]: [
                 { userId1: userId },
@@ -12,8 +12,8 @@ const getFriendsByUserId = async (userId) => {
             active: true
         },
         include: [
-            { model: UserEntity, as: 'user1' },
-            { model: UserEntity, as: 'user2' }
+            { model: User, as: 'user1' },
+            { model: User, as: 'user2' }
         ]
     });
 
@@ -21,11 +21,11 @@ const getFriendsByUserId = async (userId) => {
 };
 
 const addFriendship = async (userId, friendEmail) => {
-    const friend = await UserEntity.findOne({ where: { email: friendEmail } });
+    const friend = await User.findOne({ where: { email: friendEmail } });
     if (!friend) {
         throw new Error('Friend not found');
     }
-    const friendship = await FriendshipEntity.create({
+    const friendship = await Friendship.create({
         userId1: userId,
         userId2: friend.id,
         active: true
@@ -34,7 +34,7 @@ const addFriendship = async (userId, friendEmail) => {
 };
 
 const removeFriendship = async (userId1, userId2) => {
-    const friendship = await FriendshipEntity.findOne({
+    const friendship = await Friendship.findOne({
         where: {
             [Op.or]: [
                 { userId1, userId2 },

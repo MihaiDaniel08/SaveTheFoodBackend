@@ -2,38 +2,52 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const FoodCategoryEntity = sequelize.define('FoodCategory', {
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
-    },
-    name: {
-        type: DataTypes.STRING(30),
-        allowNull: false
-    },
-    description: {
-        type: DataTypes.STRING(100),
-        defaultValue: ''
-    },
-    userId: {
-        type: DataTypes.UUID,
-        allowNull: false
-    }
-}, {
-    tableName: 'food_categories',
-    timestamps: true
-});
+const foodCategoryModel = (sequelize, DataTypes) => {
+    const FoodCategory = sequelize.define(
+        'FoodCategory',
+        {
+            id: {
+                type: DataTypes.UUID,
+                defaultValue: DataTypes.UUIDV4,
+                primaryKey: true
+            },
+            name: {
+                type: DataTypes.STRING(30),
+                allowNull: false
+            },
+            description: {
+                type: DataTypes.STRING(100),
+                defaultValue: ''
+            },
+            userId: {
+                type: DataTypes.UUID,
+                allowNull: false
+            }
+        },
+        {
+            tableName: 'food_categories',
+            timestamps: true,
+            underscored: true,
+            freezeTableName: true
+        }
+    );
 
-FoodCategoryEntity.associate = (models) => {
-    FoodCategoryEntity.belongsTo(models.UserEntity, {
-        foreignKey: 'userId',
-        as: 'user'
-    });
-    models.UserEntity.hasMany(FoodCategoryEntity, {
-        foreignKey: 'userId',
-        as: 'foodCategories'
-    });
+    FoodCategory.associate = (models) => {
+        FoodCategory.belongsTo(models.User, {
+            foreignKey: 'userId',
+            as: 'user'
+        });
+        models.User.hasMany(FoodCategory, {
+            foreignKey: 'userId',
+            as: 'foodCategories'
+        });
+        FoodCategory.hasMany(models.Food, {
+            foreignKey: 'foodCategoryId',
+            as: 'foods'
+        });
+    };
+
+    return FoodCategory;
 };
 
-module.exports = FoodCategoryEntity;
+module.exports = foodCategoryModel;

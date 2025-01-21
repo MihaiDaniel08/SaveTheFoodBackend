@@ -1,30 +1,39 @@
-// models/friendGroupUserEntity.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const FriendGroupUserEntity = sequelize.define('FriendGroupUser', {
-    friendGroupId: {
-        type: DataTypes.UUID,
-        primaryKey: true
-    },
-    userId: {
-        type: DataTypes.UUID,
-        primaryKey: true
-    }
-}, {
-    tableName: 'friend_group_users',
-    timestamps: true
-});
+const friendGroupUserModel = (sequelize, DataTypes) => {
+    const FriendGroupUser = sequelize.define(
+        'FriendGroupUser',
+        {
+            friendGroupId: {
+                type: DataTypes.UUID,
+                primaryKey: true
+            },
+            userId: {
+                type: DataTypes.UUID,
+                primaryKey: true
+            }
+        },
+        {
+            tableName: 'friend_group_users',
+            timestamps: true,
+            underscored: true,
+            freezeTableName: true
+        }
+    );
 
-FriendGroupUserEntity.associate = (models) => {
-    FriendGroupUserEntity.belongsTo(models.FriendGroupEntity, {
-        foreignKey: 'friendGroupId',
-        as: 'friendGroup'
-    });
-    FriendGroupUserEntity.belongsTo(models.UserEntity, {
-        foreignKey: 'userId',
-        as: 'user'
-    });
+    // FriendGroupUser.associate = (models) => {
+    //     FriendGroupUser.belongsTo(models.FriendGroup, {
+    //         foreignKey: 'friendGroupId',
+    //         as: 'friendGroup'
+    //     });
+    //     FriendGroupUser.belongsTo(models.User, {
+    //         foreignKey: 'userId',
+    //         as: 'user'
+    //     });
+    // };
+
+    return FriendGroupUser;
 };
 
-module.exports = FriendGroupUserEntity;
+module.exports = friendGroupUserModel;

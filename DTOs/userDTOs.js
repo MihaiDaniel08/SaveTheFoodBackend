@@ -6,6 +6,10 @@ class AddUserDTO {
         this.password = password;
         this.name = name;
     }
+
+    static fromRequest(req) {
+        return new AddUserDTO(req.email, req.password, req.name);
+    }
 }
 
 class GetUserDTO {
@@ -13,6 +17,10 @@ class GetUserDTO {
         this.id = id;
         this.email = email;
         this.name = name;
+    }
+
+    static fromEntity(entity) {
+        return new GetUserDTO(entity.id, entity.email, entity.name);
     }
 }
 
@@ -23,12 +31,20 @@ class UpdateUserDTO {
         this.password = password;
         this.name = name;
     }
+
+    static fromRequest(req) {
+        return new UpdateUserDTO(req.id, req.email, req.password, req.name);
+    }
 }
 
 class LoginUserDTO {
     constructor(email, password) {
         this.email = email;
         this.password = password;
+    }
+
+    static fromRequest(req) {
+        return new LoginUserDTO(req.email, req.password);
     }
 }
 

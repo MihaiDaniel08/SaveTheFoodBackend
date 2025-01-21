@@ -1,34 +1,43 @@
-// models/friendshipEntity.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const FriendshipEntity = sequelize.define('Friendship', {
-    userId1: {
-        type: DataTypes.UUID,
-        primaryKey: true
-    },
-    userId2: {
-        type: DataTypes.UUID,
-        primaryKey: true
-    },
-    active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
-    }
-}, {
-    tableName: 'friendships',
-    timestamps: true
-});
+const friendshipModel = (sequelize, DataTypes) => {
+    const Friendship = sequelize.define(
+        'Friendship',
+        {
+            userId1: {
+                type: DataTypes.UUID,
+                primaryKey: true
+            },
+            userId2: {
+                type: DataTypes.UUID,
+                primaryKey: true
+            },
+            active: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: true
+            }
+        },
+        {
+            tableName: 'friendships',
+            timestamps: true,
+            underscored: true,
+            freezeTableName: true
+        }
+    );
 
-FriendshipEntity.associate = (models) => {
-    FriendshipEntity.belongsTo(models.UserEntity, {
-        foreignKey: 'userId1',
-        as: 'user1'
-    });
-    FriendshipEntity.belongsTo(models.UserEntity, {
-        foreignKey: 'userId2',
-        as: 'user2'
-    });
+    Friendship.associate = (models) => {
+        Friendship.belongsTo(models.User, {
+            foreignKey: 'userId1',
+            as: 'user1'
+        });
+        Friendship.belongsTo(models.User, {
+            foreignKey: 'userId2',
+            as: 'user2'
+        });
+    };
+
+    return Friendship;
 };
 
-module.exports = FriendshipEntity;
+module.exports = friendshipModel;

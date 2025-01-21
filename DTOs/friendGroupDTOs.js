@@ -5,6 +5,10 @@ class AddFriendGroupDTO {
         this.name = name;
         this.userId = userId;
     }
+
+    static fromRequest(req) {
+        return new AddFriendGroupDTO(req.name, req.userId);
+    }
 }
 
 class GetFriendGroupDTO {
@@ -13,6 +17,11 @@ class GetFriendGroupDTO {
         this.name = name;
         this.friends = friends; // This should be an array of FriendDTO instances
     }
+
+    static fromEntity(entity) {
+        console.log(entity);
+        return new GetFriendGroupDTO(entity.id, entity.name, entity.friendGroupUsers.map(f => FriendDTO.fromEntity(f.user6)));
+    }
 }
 
 class FriendDTO {
@@ -20,6 +29,10 @@ class FriendDTO {
         this.id = id;
         this.name = name;
         this.email = email;
+    }
+
+    static fromEntity(entity) {
+        return new FriendDTO(entity.id, entity.name, entity.email);
     }
 }
 

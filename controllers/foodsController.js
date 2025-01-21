@@ -1,6 +1,6 @@
 // controllers/foodsController.js
 const { getFoodsByUserId, addFood, claimFood, changeClaimable } = require('../databaseLayer/foodsDb');
-const { GetFoodDTO, AddFoodDTO } = require('../dtos/foodDTOs');
+const { GetFoodDTO, AddFoodDTO } = require('../DTOs/foodDTOs');
 
 const getFoodsByUserIdHandler = async (req, res) => {
     try {
@@ -16,21 +16,14 @@ const getFoodsByUserIdHandler = async (req, res) => {
 const addFoodHandler = async (req, res) => {
     try {
         const userId = req.params.userId;
-        const foodDTO = new AddFoodDTO(req.body);
-        const foodEntity = {
-            name: foodDTO.name,
-            description: foodDTO.description,
-            expirationDate: new Date(foodDTO.expirationDate),
-            purchaseDate: new Date(foodDTO.purchaseDate),
-            foodCategoryId: foodDTO.foodCategoryId,
-            quantity: foodDTO.quantity,
-            isClaimable: foodDTO.isClaimable,
-            userId: userId
-        };
-        const foodEntityReturned = await addFood(userId, foodEntity);
+        console.log(userId);
+        const foodDTO = AddFoodDTO.fromRequest(req.body);
+        console.log(foodDTO);
+        const foodEntityReturned = await addFood(userId, foodDTO);
         res.json(GetFoodDTO.fromEntity(foodEntityReturned));
     } catch (error) {
         res.status(500).json({ error: error.message });
+        console.log(error);
     }
 };
 
@@ -48,11 +41,12 @@ const claimFoodHandler = async (req, res) => {
 const changeClaimableHandler = async (req, res) => {
     try {
         const foodId = req.params.foodId;
-        const claimable = req.body.claimable;
+        const claimable = req.params.claimable;
         const response = await changeClaimable(foodId, claimable);
         res.status(response.status).json({ message: response.message });
     } catch (error) {
         res.status(500).json({ error: error.message });
+        console.log(error);
     }
 };
 

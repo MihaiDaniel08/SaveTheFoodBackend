@@ -1,34 +1,33 @@
 // databaseLayer/friendGroupsDb.js
-const { FriendGroupEntity, FriendGroupUserEntity, UserEntity } = require('../models');
-const { Op } = require('sequelize');
+const { FriendGroup, FriendGroupUser, User } = require('../models');
 
 const addFriendGroup = async (friendGroup) => {
-    return FriendGroupEntity.create(friendGroup);
+    return FriendGroup.create(friendGroup);
 };
 
 const getFriendGroupsByUserId = async (userId) => {
-    return await FriendGroupEntity.findAll({
+    return await FriendGroup.findAll({
         where: { createdByUserId: userId },
         include: [{
-            model: FriendGroupUserEntity,
-            as: 'groupUsers',
-            include: [{ model: UserEntity, as: 'user' }]
+            model: FriendGroupUser,
+            as: 'friendGroupUsers',
+            include: [{ model: User, as: 'user' }]
         }]
     });
 };
 
 const addUserToFriendGroup = async (groupId, email) => {
-    const user = await UserEntity.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email } });
     if (!user) {
         throw new Error('User not found');
     }
-    const friendGroup = await FriendGroupEntity.findByPk(groupId, {
-        include: [{ model: FriendGroupUserEntity, as: 'groupUsers' }]
+    const friendGroup = await FriendGroup.findByPk(groupId, {
+        include: [{ model: FriendGroupUser, as: 'friendGroupUsers' }]
     });
     if (!friendGroup) {
         throw new Error('Friend group not found');
     }
-    await FriendGroupUserEntity.create({
+    await FriendGroupUser.create({
         userId: user.id,
         friendGroupId: groupId
     });
@@ -36,13 +35,13 @@ const addUserToFriendGroup = async (groupId, email) => {
 };
 
 const removeUserFromFriendGroup = async (friendGroupId, userId) => {
-    const friendGroup = await FriendGroupEntity.findByPk(friendGroupId, {
-        include: [{ model: FriendGroupUserEntity, as: 'groupUsers' }]
+    const friendGroup = await FriendGroup.findByPk(friendGroupId, {
+        include: [{ model: FriendGroupUser, as: 'friendGroupUsers' }]
     });
     if (!friendGroup) {
         throw new Error('Friend group not found');
     }
-    const friendGroupUser = await FriendGroupUserEntity.findOne({
+    const friendGroupUser = await FriendGroupUser.findOne({
         where: {
             friendGroupId,
             userId
@@ -56,7 +55,7 @@ const removeUserFromFriendGroup = async (friendGroupId, userId) => {
 };
 
 const deleteFriendGroup = async (id) => {
-    const friendGroup = await FriendGroupEntity.findByPk(id);
+    const friendGroup = await FriendGroup.findByPk(id);
     if (!friendGroup) {
         return null;
     }

@@ -1,6 +1,6 @@
 // controllers/usersController.js
 const { getUserById, addUser, updateUser, deleteUser, authenticateUser } = require('../databaseLayer/usersDb');
-const { GetUserDTO, AddUserDTO, UpdateUserDTO, LoginUserDTO } = require('../dtos/userDTOs');
+const { GetUserDTO, AddUserDTO, UpdateUserDTO, LoginUserDTO } = require('../DTOs/userDTOs');
 
 const getUserByIdHandler = async (req, res) => {
     try {
@@ -14,16 +14,12 @@ const getUserByIdHandler = async (req, res) => {
 
 const addUserHandler = async (req, res) => {
     try {
-        const userDTO = new AddUserDTO(req.body);
-        const userEntity = {
-            email: userDTO.email,
-            password: userDTO.password,
-            name: userDTO.name
-        };
-        const userEntityReturned = await addUser(userEntity);
+        const userDTO = AddUserDTO.fromRequest(req.body);
+        const userEntityReturned = await addUser(userDTO);
         res.json(GetUserDTO.fromEntity(userEntityReturned));
     } catch (error) {
         res.status(500).json({ error: error.message });
+        console.log(error);
     }
 };
 
