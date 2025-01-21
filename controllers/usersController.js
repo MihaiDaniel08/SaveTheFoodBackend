@@ -52,7 +52,7 @@ const deleteUserHandler = async (req, res) => {
 
 const loginUserHandler = async (req, res) => {
     try {
-        const userDTO = new LoginUserDTO(req.body);
+        const userDTO = LoginUserDTO.fromRequest(req.body);
         const userEntity = await authenticateUser(userDTO.email, userDTO.password);
         if (userEntity) {
             res.json(GetUserDTO.fromEntity(userEntity));
